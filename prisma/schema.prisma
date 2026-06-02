@@ -1,0 +1,122 @@
+// Prisma Schema — Stencil Backend
+// Prisma v7: URL is configured in prisma.config.ts, not here
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  CLIENT
+  TATTOO_ARTIST
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+// ─── Models ───────────────────────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  artistProfile TattooArtistProfile?
+  reviewsGiven  Review[]             @relation("ClientReviews")
+  appointments  Appointment[]        @relation("ClientAppointments")
+  favorites     Favorite[]           @relation("ClientFavorites")
+
+  @@map("users")
+}
+
+model TattooArtistProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  bio       String
+  style     String
+  location  String
+  priceMin  Decimal  @db.Decimal(10, 2)
+  priceMax  Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  portfolioImages PortfolioImage[]
+  reviews         Review[]         @relation("ArtistReviews")
+  appointments    Appointment[]    @relation("ArtistAppointments")
+  favorites       Favorite[]       @relation("ArtistFavorites")
+
+  @@map("tattoo_artist_profiles")
+}
+
+model PortfolioImage {
+  id              String   @id @default(uuid())
+  artistProfileId String
+  imageUrl        String
+  description     String?
+  createdAt       DateTime @default(now())
+
+  // Relations
+  artistProfile TattooArtistProfile @relation(fields: [artistProfileId], references: [id], onDelete: Cascade)
+
+  @@map("portfolio_images")
+}
+
+model Review {
+  id              String   @id @default(uuid())
+  clientId        String
+  artistProfileId String
+  rating          Int
+  comment         String
+  createdAt       DateTime @default(now())
+
+  // Relations
+  client        User                @relation("ClientReviews", fields: [clientId], references: [id], onDelete: Cascade)
+  artistProfile TattooArtistProfile @relation("ArtistReviews", fields: [artistProfileId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  clientId        String
+  artistProfileId String
+  date            DateTime          @db.Timestamptz
+  status          AppointmentStatus @default(PENDING)
+  notes           String?
+  createdAt       DateTime          @default(now())
+
+  // Relations
+  client        User                @relation("ClientAppointments", fields: [clientId], references: [id], onDelete: Cascade)
+  artistProfile TattooArtistProfile @relation("ArtistAppointments", fields: [artistProfileId], references: [id], onDelete: Cascade)
+
+  @@map("appointments")
+}
+
+model Favorite {
+  id              String   @id @default(uuid())
+  clientId        String
+  artistProfileId String
+  createdAt       DateTime @default(now())
+
+  // Relations
+  client        User                @relation("ClientFavorites", fields: [clientId], references: [id], onDelete: Cascade)
+  artistProfile TattooArtistProfile @relation("ArtistFavorites", fields: [artistProfileId], references: [id], onDelete: Cascade)
+
+  @@unique([clientId, artistProfileId])
+  @@map("favorites")
+}
