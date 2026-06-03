@@ -25,7 +25,9 @@ export class AppointmentRepository implements IAppointmentRepository {
         take,
         orderBy: { date: 'asc' },
         include: {
-          artistProfile: { select: { id: true, style: true, location: true } },
+          artistProfile: { 
+            select: { id: true, style: true, location: true, name: true, user: { select: { email: true } } } 
+          },
         },
       }),
       prisma.appointment.count({ where: { clientId } }),
@@ -100,6 +102,8 @@ export class AppointmentRepository implements IAppointmentRepository {
     status: string;
     notes?: string | null;
     createdAt: Date;
+    client?: { email: string } | null;
+    artistProfile?: { name: string | null; user: { email: string } } | null;
   }): Appointment {
     return {
       id: raw.id,
@@ -109,6 +113,8 @@ export class AppointmentRepository implements IAppointmentRepository {
       status: raw.status as AppointmentStatus,
       notes: raw.notes ?? null,
       createdAt: raw.createdAt,
+      clientName: raw.client?.email?.split('@')[0],
+      artistName: raw.artistProfile?.name || raw.artistProfile?.user?.email?.split('@')[0],
     };
   }
 }

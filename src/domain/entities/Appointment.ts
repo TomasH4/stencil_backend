@@ -14,6 +14,8 @@ export interface Appointment {
   status: AppointmentStatus;
   notes?: string | null;
   createdAt: Date;
+  clientName?: string;
+  artistName?: string;
 }
 
 export interface CreateAppointmentData {
