@@ -45,6 +45,7 @@ model User {
 model TattooArtistProfile {
   id        String   @id @default(uuid())
   userId    String   @unique
+  name      String?
   bio       String
   style     String
   location  String

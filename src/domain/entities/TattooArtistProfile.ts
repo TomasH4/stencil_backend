@@ -3,6 +3,7 @@
 export interface TattooArtistProfile {
   id: string;
   userId: string;
+  name?: string;
   bio: string;
   style: string;
   location: string;
@@ -16,6 +17,7 @@ export interface TattooArtistProfile {
 
 export interface CreateArtistProfileData {
   userId: string;
+  name?: string;
   bio: string;
   style: string;
   location: string;

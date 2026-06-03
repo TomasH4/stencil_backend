@@ -5,6 +5,7 @@
 import { z } from 'zod';
 
 export const UpdateArtistProfileDto = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').optional(),
   bio: z.string().min(1, 'Bio is required').optional(),
   style: z.string().min(1, 'Style is required').optional(),
   location: z.string().min(1, 'Location is required').optional(),

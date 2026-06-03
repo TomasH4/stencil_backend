@@ -62,6 +62,7 @@ export class TattooArtistProfileRepository
     const profile = await prisma.tattooArtistProfile.create({
       data: {
         userId: data.userId,
+        name: data.name,
         bio: data.bio,
         style: data.style,
         location: data.location,
@@ -77,6 +78,7 @@ export class TattooArtistProfileRepository
     data: UpdateArtistProfileData,
   ): Promise<TattooArtistProfile> {
     const updateData: Prisma.TattooArtistProfileUpdateInput = {};
+    if (data.name !== undefined) updateData.name = data.name;
     if (data.bio !== undefined) updateData.bio = data.bio;
     if (data.style !== undefined) updateData.style = data.style;
     if (data.location !== undefined) updateData.location = data.location;
@@ -99,6 +101,7 @@ export class TattooArtistProfileRepository
   private mapToEntity(raw: {
     id: string;
     userId: string;
+    name: string | null;
     bio: string;
     style: string;
     location: string;
@@ -110,6 +113,7 @@ export class TattooArtistProfileRepository
     return {
       id: raw.id,
       userId: raw.userId,
+      name: raw.name || undefined,
       bio: raw.bio,
       style: raw.style,
       location: raw.location,
