@@ -9,7 +9,7 @@ const profileRepo = new TattooArtistProfileRepository();
 export class PortfolioController {
   static async addImage(req: Request, res: Response) {
     try {
-      const { id } = req.params;
+      const { id } = req.params as { id: string };
       const { description } = req.body;
       const userId = req.user!.id;
 
@@ -46,7 +46,7 @@ export class PortfolioController {
 
   static async removeImage(req: Request, res: Response) {
     try {
-      const { id, imageId } = req.params;
+      const { id, imageId } = req.params as { id: string; imageId: string };
       const userId = req.user!.id;
 
       // Verify the profile exists and belongs to the user

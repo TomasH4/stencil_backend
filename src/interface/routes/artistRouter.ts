@@ -11,7 +11,7 @@ import { CreateArtistProfileDto } from '../../application/dtos/artist/CreateArti
 import { UpdateArtistProfileDto } from '../../application/dtos/artist/UpdateArtistProfileDto';
 import { GetArtistsQueryDto } from '../../application/dtos/artist/GetArtistsQueryDto';
 import { AddPortfolioImageDto } from '../../application/dtos/artist/AddPortfolioImageDto';
-import { upload } from '../middlewares/upload.middleware';
+import { upload } from '../../infrastructure/middlewares/upload.middleware';
 
 export const artistRouter = Router();
 
