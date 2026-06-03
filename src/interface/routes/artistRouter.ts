@@ -5,10 +5,13 @@ import { ArtistController } from '../controllers/ArtistController';
 import { authenticate } from '../middlewares/authenticate';
 import { authorize } from '../middlewares/authorize';
 import { validateBody } from '../middlewares/validateBody';
+import { PortfolioController } from '../controllers/PortfolioController';
 import { validateQuery } from '../middlewares/validateQuery';
 import { CreateArtistProfileDto } from '../../application/dtos/artist/CreateArtistProfileDto';
 import { UpdateArtistProfileDto } from '../../application/dtos/artist/UpdateArtistProfileDto';
 import { GetArtistsQueryDto } from '../../application/dtos/artist/GetArtistsQueryDto';
+import { AddPortfolioImageDto } from '../../application/dtos/artist/AddPortfolioImageDto';
+import { upload } from '../middlewares/upload.middleware';
 
 export const artistRouter = Router();
 
@@ -38,3 +41,21 @@ artistRouter.put(
 
 // DELETE /api/v1/artists/:id — TATTOO_ARTIST only (owner)
 artistRouter.delete('/:id', authenticate, authorize('TATTOO_ARTIST'), ArtistController.delete);
+
+// POST /api/v1/artists/:id/portfolio — TATTOO_ARTIST only (owner)
+artistRouter.post(
+  '/:id/portfolio',
+  authenticate,
+  authorize('TATTOO_ARTIST'),
+  upload.single('image'),
+  validateBody(AddPortfolioImageDto),
+  PortfolioController.addImage,
+);
+
+// DELETE /api/v1/artists/:id/portfolio/:imageId — TATTOO_ARTIST only (owner)
+artistRouter.delete(
+  '/:id/portfolio/:imageId',
+  authenticate,
+  authorize('TATTOO_ARTIST'),
+  PortfolioController.removeImage,
+);

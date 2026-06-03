@@ -15,7 +15,10 @@ export class TattooArtistProfileRepository
   implements ITattooArtistProfileRepository
 {
   async findById(id: string): Promise<TattooArtistProfile | null> {
-    const profile = await prisma.tattooArtistProfile.findUnique({ where: { id } });
+    const profile = await prisma.tattooArtistProfile.findUnique({ 
+      where: { id },
+      include: { portfolioImages: true }
+    });
     if (!profile) return null;
     return this.mapToEntity(profile);
   }
@@ -53,7 +56,10 @@ export class TattooArtistProfileRepository
   }
 
   async findByUserId(userId: string): Promise<TattooArtistProfile | null> {
-    const profile = await prisma.tattooArtistProfile.findUnique({ where: { userId } });
+    const profile = await prisma.tattooArtistProfile.findUnique({ 
+      where: { userId },
+      include: { portfolioImages: true }
+    });
     if (!profile) return null;
     return this.mapToEntity(profile);
   }
@@ -107,6 +113,7 @@ export class TattooArtistProfileRepository
     location: string;
     priceMin: Prisma.Decimal;
     priceMax: Prisma.Decimal;
+    portfolioImages?: { id: string; imageUrl: string; description: string | null; createdAt: Date }[];
     createdAt: Date;
     updatedAt: Date;
   }): TattooArtistProfile {
@@ -119,6 +126,12 @@ export class TattooArtistProfileRepository
       location: raw.location,
       priceMin: raw.priceMin.toNumber(),
       priceMax: raw.priceMax.toNumber(),
+      portfolioImages: raw.portfolioImages?.map(img => ({
+        id: img.id,
+        imageUrl: img.imageUrl,
+        description: img.description || undefined,
+        createdAt: img.createdAt,
+      })) || [],
       createdAt: raw.createdAt,
       updatedAt: raw.updatedAt,
     };

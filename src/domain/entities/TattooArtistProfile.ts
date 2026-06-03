@@ -1,5 +1,12 @@
 // BE-28: TattooArtistProfile entity — domain layer
 
+export interface PortfolioImage {
+  id: string;
+  imageUrl: string;
+  description?: string;
+  createdAt: Date;
+}
+
 export interface TattooArtistProfile {
   id: string;
   userId: string;
@@ -11,6 +18,7 @@ export interface TattooArtistProfile {
   priceMin: number;
   /** Stored as Decimal in DB, exposed as number in domain */
   priceMax: number;
+  portfolioImages?: PortfolioImage[];
   createdAt: Date;
   updatedAt: Date;
 }
