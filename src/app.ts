@@ -9,6 +9,7 @@ import { authRouter } from './interface/routes/authRouter';
 import { artistRouter } from './interface/routes/artistRouter';
 import { reviewRouter } from './interface/routes/reviewRouter';
 import { appointmentRouter } from './interface/routes/appointmentRouter';
+import { favoriteRouter } from './interface/routes/favoriteRouter';
 import { errorHandler } from './interface/middlewares/errorHandler';
 
 export const app = express();
@@ -25,6 +26,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/artists', artistRouter);
 app.use('/api/v1/reviews', reviewRouter);
 app.use('/api/v1/appointments', appointmentRouter);
+app.use('/api/v1/favorites', favoriteRouter);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 

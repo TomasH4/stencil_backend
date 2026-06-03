@@ -10,6 +10,8 @@ export const CreateArtistProfileDto = z
     location: z.string().min(1, 'Location is required'),
     priceMin: z.number().positive('priceMin must be a positive number'),
     priceMax: z.number().positive('priceMax must be a positive number'),
+    whatsappNumber: z.string().optional(),
+    instagramUrl: z.string().url('Invalid Instagram URL').optional().or(z.literal('')),
   })
   .refine((data) => data.priceMax > data.priceMin, {
     message: 'priceMax must be greater than priceMin',

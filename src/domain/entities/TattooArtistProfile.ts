@@ -18,6 +18,9 @@ export interface TattooArtistProfile {
   priceMin: number;
   /** Stored as Decimal in DB, exposed as number in domain */
   priceMax: number;
+  profilePictureUrl?: string;
+  whatsappNumber?: string;
+  instagramUrl?: string;
   portfolioImages?: PortfolioImage[];
   createdAt: Date;
   updatedAt: Date;
@@ -31,9 +34,20 @@ export interface CreateArtistProfileData {
   location: string;
   priceMin: number;
   priceMax: number;
+  whatsappNumber?: string;
+  instagramUrl?: string;
 }
 
-export type UpdateArtistProfileData = Partial<Omit<CreateArtistProfileData, 'userId'>>;
+export interface UpdateArtistProfileData {
+  name?: string;
+  bio?: string;
+  style?: string;
+  location?: string;
+  priceMin?: number;
+  priceMax?: number;
+  whatsappNumber?: string;
+  instagramUrl?: string;
+}
 
 /** Filters used when listing artist profiles */
 export interface ArtistFilters {

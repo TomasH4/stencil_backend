@@ -38,6 +38,59 @@ export const ArtistController = {
     }
   },
 
+  async uploadAvatar(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const profileId = req.params['id'] as string;
+      const userId = req.user!.id;
+
+      if (!req.file) {
+        res.status(400).json({ error: { message: 'La imagen es requerida' } });
+        return;
+      }
+
+      // Verify ownership
+      const profile = await artistRepo.findById(profileId);
+      if (!profile) {
+        res.status(404).json({ error: { message: 'Perfil no encontrado' } });
+        return;
+      }
+      if (profile.userId !== userId) {
+        res.status(403).json({ error: { message: 'No puedes modificar un perfil que no es tuyo' } });
+        return;
+      }
+
+      // Upload to Supabase Storage
+      const { supabase } = await import('../../infrastructure/storage/supabaseClient');
+      const pathModule = await import('path');
+      const fileExt = pathModule.extname(req.file.originalname);
+      const fileName = `${Date.now()}-avatar${fileExt}`;
+      const filePath = `avatars/${userId}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('portafolios')
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Supabase upload error:', uploadError);
+        res.status(500).json({ error: { message: 'Error subiendo avatar a Supabase', details: uploadError.message } });
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('portafolios')
+        .getPublicUrl(filePath);
+
+      const updatedProfile = await artistRepo.updateAvatar(profileId, publicUrlData.publicUrl);
+      res.status(200).json({ data: updatedProfile });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.id;

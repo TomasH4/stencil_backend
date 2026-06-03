@@ -47,10 +47,13 @@ model TattooArtistProfile {
   userId    String   @unique
   name      String?
   bio       String
-  style     String
-  location  String
-  priceMin  Decimal  @db.Decimal(10, 2)
-  priceMax  Decimal  @db.Decimal(10, 2)
+  style            String
+  location         String
+  priceMin         Decimal  @db.Decimal(10, 2)
+  priceMax         Decimal  @db.Decimal(10, 2)
+  profilePictureUrl String?
+  whatsappNumber   String?
+  instagramUrl     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

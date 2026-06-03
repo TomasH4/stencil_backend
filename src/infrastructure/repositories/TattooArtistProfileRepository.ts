@@ -74,6 +74,8 @@ export class TattooArtistProfileRepository
         location: data.location,
         priceMin: new Prisma.Decimal(data.priceMin),
         priceMax: new Prisma.Decimal(data.priceMax),
+        whatsappNumber: data.whatsappNumber,
+        instagramUrl: data.instagramUrl,
       },
     });
     return this.mapToEntity(profile);
@@ -92,10 +94,20 @@ export class TattooArtistProfileRepository
       updateData.priceMin = new Prisma.Decimal(data.priceMin);
     if (data.priceMax !== undefined)
       updateData.priceMax = new Prisma.Decimal(data.priceMax);
+    if (data.whatsappNumber !== undefined) updateData.whatsappNumber = data.whatsappNumber;
+    if (data.instagramUrl !== undefined) updateData.instagramUrl = data.instagramUrl;
 
     const profile = await prisma.tattooArtistProfile.update({
       where: { id },
       data: updateData,
+    });
+    return this.mapToEntity(profile);
+  }
+
+  async updateAvatar(id: string, profilePictureUrl: string): Promise<TattooArtistProfile> {
+    const profile = await prisma.tattooArtistProfile.update({
+      where: { id },
+      data: { profilePictureUrl },
     });
     return this.mapToEntity(profile);
   }
@@ -113,6 +125,9 @@ export class TattooArtistProfileRepository
     location: string;
     priceMin: Prisma.Decimal;
     priceMax: Prisma.Decimal;
+    profilePictureUrl: string | null;
+    whatsappNumber: string | null;
+    instagramUrl: string | null;
     portfolioImages?: { id: string; imageUrl: string; description: string | null; createdAt: Date }[];
     createdAt: Date;
     updatedAt: Date;
@@ -126,6 +141,9 @@ export class TattooArtistProfileRepository
       location: raw.location,
       priceMin: raw.priceMin.toNumber(),
       priceMax: raw.priceMax.toNumber(),
+      profilePictureUrl: raw.profilePictureUrl || undefined,
+      whatsappNumber: raw.whatsappNumber || undefined,
+      instagramUrl: raw.instagramUrl || undefined,
       portfolioImages: raw.portfolioImages?.map(img => ({
         id: img.id,
         imageUrl: img.imageUrl,

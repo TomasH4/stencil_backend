@@ -40,7 +40,14 @@ export class PortfolioController {
         });
 
       if (uploadError) {
-        throw new Error(`Error subiendo a Supabase: ${uploadError.message}`);
+        console.error('Supabase upload error:', uploadError);
+        return res.status(500).json({ 
+          error: { 
+            message: 'Error subiendo a Supabase Storage', 
+            details: uploadError.message,
+            statusCode: (uploadError as any).statusCode
+          } 
+        });
       }
 
       // Get public URL

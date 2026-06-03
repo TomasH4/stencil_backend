@@ -11,6 +11,8 @@ export const UpdateArtistProfileDto = z.object({
   location: z.string().min(1, 'Location is required').optional(),
   priceMin: z.number().positive('priceMin must be a positive number').optional(),
   priceMax: z.number().positive('priceMax must be a positive number').optional(),
+  whatsappNumber: z.string().optional().or(z.literal('')),
+  instagramUrl: z.string().url('URL de Instagram inválida').optional().or(z.literal('')),
 });
 
 export type UpdateArtistProfileDtoType = z.infer<typeof UpdateArtistProfileDto>;

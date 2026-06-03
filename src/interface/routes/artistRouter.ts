@@ -45,6 +45,15 @@ artistRouter.put(
 // DELETE /api/v1/artists/:id — TATTOO_ARTIST only (owner)
 artistRouter.delete('/:id', authenticate, authorize('TATTOO_ARTIST'), ArtistController.delete);
 
+// POST /api/v1/artists/:id/avatar — TATTOO_ARTIST only (owner)
+artistRouter.post(
+  '/:id/avatar',
+  authenticate,
+  authorize('TATTOO_ARTIST'),
+  upload.single('avatar'),
+  ArtistController.uploadAvatar,
+);
+
 // POST /api/v1/artists/:id/portfolio — TATTOO_ARTIST only (owner)
 artistRouter.post(
   '/:id/portfolio',
