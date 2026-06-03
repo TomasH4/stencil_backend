@@ -38,6 +38,20 @@ export const ArtistController = {
     }
   },
 
+  async getMe(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = req.user!.id;
+      const profile = await artistRepo.findByUserId(userId);
+      if (!profile) {
+        res.status(404).json({ error: { message: 'Perfil no encontrado' } });
+        return;
+      }
+      res.status(200).json({ data: profile });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async create(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user!.id;

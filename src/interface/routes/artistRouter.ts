@@ -18,6 +18,9 @@ export const artistRouter = Router();
 // GET /api/v1/artists — public, filterable and paginated
 artistRouter.get('/', validateQuery(GetArtistsQueryDto), ArtistController.getAll);
 
+// GET /api/v1/artists/me — TATTOO_ARTIST only
+artistRouter.get('/me', authenticate, authorize('TATTOO_ARTIST'), ArtistController.getMe);
+
 // GET /api/v1/artists/:id — public
 artistRouter.get('/:id', ArtistController.getById);
 
