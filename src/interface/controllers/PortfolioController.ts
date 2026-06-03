@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../infrastructure/database/prisma.client';
 import { TattooArtistProfileRepository } from '../../infrastructure/repositories/TattooArtistProfileRepository';
-import fs from 'fs';
+import { supabase } from '../../infrastructure/storage/supabaseClient';
 import path from 'path';
 
 const profileRepo = new TattooArtistProfileRepository();
@@ -17,9 +17,6 @@ export class PortfolioController {
         return res.status(400).json({ error: { message: 'La imagen es requerida' } });
       }
 
-      // The file path relative to the domain
-      const imageUrl = `/uploads/${req.file.filename}`;
-
       // Verify the profile exists and belongs to the user
       const profile = await profileRepo.findById(id);
       if (!profile) {
@@ -28,6 +25,30 @@ export class PortfolioController {
       if (profile.userId !== userId) {
         return res.status(403).json({ error: { message: 'No puedes modificar un portafolio que no es tuyo' } });
       }
+
+      // Upload to Supabase Storage
+      const fileExt = path.extname(req.file.originalname);
+      const fileName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${fileExt}`;
+      const filePath = `portfolios/${userId}/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('portafolios')
+        .upload(filePath, req.file.buffer, {
+          contentType: req.file.mimetype,
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw new Error(`Error subiendo a Supabase: ${uploadError.message}`);
+      }
+
+      // Get public URL
+      const { data: publicUrlData } = supabase.storage
+        .from('portafolios')
+        .getPublicUrl(filePath);
+
+      const imageUrl = publicUrlData.publicUrl;
 
       // Create the image
       const image = await prisma.portfolioImage.create({
@@ -67,12 +88,14 @@ export class PortfolioController {
       // Delete the image from database
       await prisma.portfolioImage.delete({ where: { id: imageId } });
 
-      // Delete file from filesystem
-      if (image.imageUrl && image.imageUrl.startsWith('/uploads/')) {
-        const filename = image.imageUrl.replace('/uploads/', '');
-        const filepath = path.join(process.cwd(), 'uploads', filename);
-        if (fs.existsSync(filepath)) {
-          fs.unlinkSync(filepath);
+      // Delete file from Supabase
+      if (image.imageUrl && image.imageUrl.includes('supabase.co')) {
+        // Extract the file path from the public URL
+        // URL format: https://.../storage/v1/object/public/portafolios/portfolios/userId/filename.ext
+        const urlParts = image.imageUrl.split('/portafolios/');
+        if (urlParts.length > 1) {
+          const filePath = urlParts[1];
+          await supabase.storage.from('portafolios').remove([filePath]);
         }
       }
 
