@@ -22,7 +22,7 @@ function getSecret(): string {
  * Expiration is read from JWT_EXPIRES_IN env variable (default: 7d).
  */
 export function generateToken(payload: JwtPayload): string {
-  const expiresIn = (process.env['JWT_EXPIRES_IN'] ?? '7d') as jwt.SignOptions['expiresIn'];
+  const expiresIn = (process.env['JWT_EXPIRES_IN'] ?? '1h') as jwt.SignOptions['expiresIn'];
   return jwt.sign(payload, getSecret(), { expiresIn });
 }
 
